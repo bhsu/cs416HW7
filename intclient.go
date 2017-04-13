@@ -28,8 +28,9 @@ import (
 
 // List of nodes' listening addresses for client connections
 var NODES = []string{
-	"198.162.33.46:9988",
-  //"98.76.54.32:10"
+	"52.233.44.219:6060",
+"13.78.86.212:6060",
+"13.70.91.92:6060",
 }
 
 // printUsage prints the usage information for the client.
