@@ -17,6 +17,8 @@ import (
 	"strings"
 	"time"
 	"strconv"
+	"net/http"
+	"bytes"
 )
 
 const CREATE_CLIENT_TIMEOUT = 6 * time.Second
@@ -204,7 +206,7 @@ func (conn *myconn) NewTX() (tx, error) {
 			//fmt.Println("Client was nil after creating, so all nodes are dead")
 			break // no more nodes to try
 		}
-		OwnIp = getAddress()
+		OwnIp = getExternalIp()
 		var response CreateTransactionResponse
 		request := CreateTransactionRequest{
 			IpPort: OwnIp,
@@ -219,6 +221,26 @@ func (conn *myconn) NewTX() (tx, error) {
 	}
 
 	return nil, errors.New("All nodes are dead")
+}
+
+func getExternalIp() string{
+	var ip string
+
+	resp, err := http.Get("http://myexternalip.com/raw")
+	if err != nil {
+		os.Stderr.WriteString(err.Error())
+		os.Stderr.WriteString("\n")
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+	//io.Copy(os.Stdout, resp.Body)
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
+	newStr := buf.String()
+	ip = strings.TrimSpace(newStr)
+	//fmt.Println("getexternalIP", localaddress)
+
+	return ip
 }
 
 // Ask node for the hash values of blocks pointing to the block with the hash parentHash
